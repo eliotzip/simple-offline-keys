@@ -250,11 +250,11 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
     disabled: false,
   });
 
+  // Simplified real-time style with no animation delays
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition: 'none', // Always disable transition for real-time movement
-    opacity: 1, // Keep fully opaque
-    zIndex: isDragging ? 50 : 1,
+    transition: 'none', // No transition for immediate positioning
+    zIndex: isDragging ? 1000 : 1,
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -370,7 +370,20 @@ const Vault: React.FC = () => {
   const handleCreateFolder = async () => {
     const name = prompt('Enter folder name:');
     if (name?.trim()) {
-      const success = await createFolder(name.trim());
+      // Check for duplicate names
+      const trimmedName = name.trim();
+      const existingFolder = data?.folders.find(f => f.name.toLowerCase() === trimmedName.toLowerCase());
+      
+      if (existingFolder) {
+        toast({
+          title: "Duplicate Name",
+          description: "A folder with this name already exists. Please choose a different name.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const success = await createFolder(trimmedName);
       toast({
         title: success ? "Folder Created" : "Error",
         description: success ? "New folder created" : "Failed to create folder",
@@ -607,13 +620,13 @@ const Vault: React.FC = () => {
             )}
           </div>
 
-          {/* Single DragOverlay for both folders and entries */}
+          {/* Simplified DragOverlay - no animation effects */}
           <DragOverlay>
             {activeId ? (
-              <div className="opacity-90 transform scale-105 transition-transform">
+              <div>
                 {/* Render folder or entry being dragged */}
                 {sortedFolders.find(f => f.id === activeId) ? (
-                  <Button variant="vault-primary" className="flex-col h-auto p-3 min-w-[80px] shadow-vault-hover rotate-3">
+                  <Button variant="vault-primary" className="flex-col h-auto p-3 min-w-[80px] shadow-vault-hover">
                     <Folder className="w-6 h-6 mb-1" />
                     <span className="text-xs truncate max-w-full">
                       {sortedFolders.find(f => f.id === activeId)?.name}
