@@ -295,7 +295,7 @@ const Vault: React.FC = () => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // 5px movement required to start drag
+        distance: 3, // Reduced distance for better responsiveness
       },
     }),
     useSensor(KeyboardSensor, {
@@ -308,12 +308,11 @@ const Vault: React.FC = () => {
     
     let entries = data.entries;
     
-    // Filter by folder
+    // Filter by folder - "All" shows everything, specific folder shows only that folder's entries
     if (selectedFolder) {
       entries = entries.filter(entry => entry.folderId === selectedFolder);
-    } else {
-      entries = entries.filter(entry => !entry.folderId);
     }
+    // Note: "All" folder shows all entries regardless of folderId
     
     // Filter by search term
     if (searchTerm) {
@@ -414,7 +413,8 @@ const Vault: React.FC = () => {
       const folderId = over.id.replace('folder-drop-', '');
       const entryId = active.id as string;
       
-      if (filteredEntries.find(e => e.id === entryId)) {
+      // Check if it's an entry being dragged
+      if (data?.entries.find(e => e.id === entryId)) {
         const success = await moveEntryToFolder(entryId, folderId);
         if (success) {
           toast({
@@ -427,24 +427,32 @@ const Vault: React.FC = () => {
     }
 
     // Handle folder reordering
-    if (sortedFolders.find(f => f.id === active.id)) {
-      const oldIndex = sortedFolders.findIndex(f => f.id === active.id);
-      const newIndex = sortedFolders.findIndex(f => f.id === over.id);
+    if (data?.folders.find(f => f.id === active.id)) {
+      const activeIndex = sortedFolders.findIndex(f => f.id === active.id);
+      let newIndex = sortedFolders.findIndex(f => f.id === over.id);
       
-      if (oldIndex !== newIndex) {
-        const newFolders = arrayMove(sortedFolders, oldIndex, newIndex);
+      // If dropping over a folder drop zone, get the actual folder id
+      if (typeof over.id === 'string' && over.id.startsWith('folder-drop-')) {
+        const folderId = over.id.replace('folder-drop-', '');
+        newIndex = sortedFolders.findIndex(f => f.id === folderId);
+      }
+      
+      if (activeIndex !== newIndex && newIndex !== -1) {
+        const newFolders = arrayMove(sortedFolders, activeIndex, newIndex);
         reorderFolders(newFolders);
       }
       return;
     }
 
-    // Handle entry reordering
-    const oldIndex = filteredEntries.findIndex(e => e.id === active.id);
-    const newIndex = filteredEntries.findIndex(e => e.id === over.id);
-    
-    if (oldIndex !== newIndex) {
-      const newEntries = arrayMove(filteredEntries, oldIndex, newIndex);
-      reorderEntries(newEntries);
+    // Handle entry reordering within the same context
+    if (data?.entries.find(e => e.id === active.id)) {
+      const activeIndex = filteredEntries.findIndex(e => e.id === active.id);
+      const newIndex = filteredEntries.findIndex(e => e.id === over.id);
+      
+      if (activeIndex !== newIndex && newIndex !== -1) {
+        const newEntries = arrayMove(filteredEntries, activeIndex, newIndex);
+        reorderEntries(newEntries);
+      }
     }
   };
 
@@ -510,7 +518,7 @@ const Vault: React.FC = () => {
                 </div>
               ) : null}
             </DragOverlay>
-            <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2">
+            <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1 scrollbar-thin">
               <Button
                 variant={selectedFolder === null ? "vault-primary" : "vault"}
                 className="flex-col h-auto p-3 min-w-[80px]"
