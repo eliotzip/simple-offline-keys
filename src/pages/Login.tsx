@@ -109,9 +109,9 @@ const Login: React.FC = () => {
                   onClick={() => setShowPin(!showPin)}
                 >
                   {showPin ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
                     <Eye className="w-4 h-4" />
+                  ) : (
+                    <EyeOff className="w-4 h-4" />
                   )}
                 </Button>
               </div>

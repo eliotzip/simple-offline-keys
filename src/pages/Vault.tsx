@@ -209,10 +209,7 @@ const FolderDropZone: React.FC<FolderDropZoneProps> = ({
         onClick={onClick}
       >
         <Folder className="w-6 h-6 mb-1" />
-        <span className="text-xs truncate max-w-full">{folder.name}</span>
-        {entryCount > 0 && (
-          <span className="text-xs text-muted-foreground">{entryCount}</span>
-        )}
+                <span className="text-xs truncate max-w-full">{folder.name}</span>
         
         <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button
@@ -494,13 +491,25 @@ const Vault: React.FC = () => {
 
         {/* Folders */}
         <div className="mb-6 vault-slide-up">
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDragEnd={handleDragEnd}
-            >
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+          >
+            <DragOverlay>
+              {activeId && sortedFolders.find(f => f.id === activeId) ? (
+                <div className="opacity-90 transform scale-105 transition-transform">
+                  <Button variant="vault-primary" className="flex-col h-auto p-3 min-w-[80px] shadow-vault-hover">
+                    <Folder className="w-6 h-6 mb-1" />
+                    <span className="text-xs truncate max-w-full">
+                      {sortedFolders.find(f => f.id === activeId)?.name}
+                    </span>
+                  </Button>
+                </div>
+              ) : null}
+            </DragOverlay>
             <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2">
               <Button
                 variant={selectedFolder === null ? "vault-primary" : "vault"}
@@ -509,9 +518,6 @@ const Vault: React.FC = () => {
               >
                 <Folder className="w-6 h-6 mb-1" />
                 <span className="text-xs">All</span>
-                <span className="text-xs text-muted-foreground">
-                  {data.entries.filter(e => !e.folderId).length}
-                </span>
               </Button>
 
               <SortableContext
@@ -611,7 +617,7 @@ const Vault: React.FC = () => {
               </SortableContext>
               <DragOverlay>
                 {activeId ? (
-                  <div className="opacity-90 transform rotate-3 scale-105">
+                  <div className="opacity-90 transform scale-105 transition-transform">
                     {/* Render folder or entry being dragged */}
                     {sortedFolders.find(f => f.id === activeId) ? (
                       <Button variant="vault-primary" className="flex-col h-auto p-3 min-w-[80px] shadow-vault-hover">
