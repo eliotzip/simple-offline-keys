@@ -268,7 +268,7 @@ const AddEntry: React.FC = () => {
                       <SelectValue placeholder="Select a folder (optional)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="no-folder">No folder</SelectItem>
+                      <SelectItem value="no-folder">None</SelectItem>
                       {sortedFolders.map((folder) => (
                         <SelectItem key={folder.id} value={folder.id}>
                           {folder.name}

@@ -24,6 +24,7 @@ import {
   MoreVertical,
   GripVertical
 } from 'lucide-react';
+import DragHandle from '@/components/ui/drag-handle';
 import { useNavigate } from 'react-router-dom';
 import {
   DndContext,
@@ -107,7 +108,7 @@ const SortableEntry: React.FC<SortableEntryProps> = ({
                     {...attributes} 
                     {...listeners}
                   >
-                    <GripVertical className="w-4 h-4 text-muted-foreground" />
+                    <DragHandle className="text-muted-foreground" />
                   </div>
                 )}
                 <div 
@@ -376,11 +377,11 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
       <div className="relative w-full h-full">
         {isMobile && (
           <div 
-            className="absolute top-1 left-1 z-10 cursor-grab active:cursor-grabbing p-1"
+            className="absolute top-1 left-1 z-10 cursor-grab active:cursor-grabbing p-1 bg-background/80 rounded"
             {...attributes} 
             {...listeners}
           >
-            <GripVertical className="w-3 h-3 text-muted-foreground bg-background/80 rounded" />
+            <DragHandle className="text-muted-foreground" />
           </div>
         )}
         <div 
