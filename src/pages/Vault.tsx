@@ -303,7 +303,7 @@ const FolderDropZone: React.FC<FolderDropZoneProps> = ({
         <div className="relative">
           <Folder className={`w-8 h-8 mb-2 transition-all duration-300 ${
             isOver ? 'animate-bounce' : ''
-          } ${isSelected ? 'text-vault-primary-foreground' : 'text-vault-outline group-hover:text-vault-outline-hover'}`} />
+          } ${isSelected ? 'text-vault-outline-active' : 'text-vault-outline group-hover:text-vault-outline-hover'}`} />
           {entryCount > 0 && (
             <div className="absolute -top-1 -right-1 bg-vault-primary text-vault-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {entryCount}
@@ -702,7 +702,7 @@ const Vault: React.FC = () => {
                 className="flex-col h-auto p-3 min-w-[80px] flex-shrink-0"
                 onClick={() => setSelectedFolder(null)}
               >
-                <Folder className="w-6 h-6 mb-1" />
+                <Folder className={`w-6 h-6 mb-1 ${selectedFolder === null ? 'text-vault-outline-active' : ''}`} />
                 <span className="text-xs">All</span>
               </Button>
 
@@ -742,7 +742,7 @@ const Vault: React.FC = () => {
             <Button
               variant="vault-primary"
               size="lg"
-              onClick={() => navigate('/add-entry')}
+              onClick={() => navigate(`/add-entry${selectedFolder ? `?folder=${selectedFolder}` : ''}`)}
               className="w-full max-w-md"
             >
               <Plus className="w-5 h-5" />

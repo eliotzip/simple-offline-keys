@@ -19,7 +19,7 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         vault: "border border-vault-outline bg-transparent text-foreground hover:border-vault-outline-active hover:bg-primary hover:text-primary-foreground transition-vault-smooth",
-        "vault-primary": "bg-primary text-primary-foreground border border-primary hover:bg-transparent hover:text-primary transition-vault-smooth",
+        "vault-primary": "bg-transparent text-foreground border border-vault-outline-active transition-vault-smooth",
         "vault-danger": "border border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground transition-vault-smooth",
       },
       size: {

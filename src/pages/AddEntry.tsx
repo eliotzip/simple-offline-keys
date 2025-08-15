@@ -13,6 +13,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 const AddEntry: React.FC = () => {
   const [searchParams] = useSearchParams();
   const editId = searchParams.get('edit');
+  const preSelectedFolder = searchParams.get('folder');
   const isEditing = !!editId;
 
   const { data, saveEntry, updateEntry } = useVault();
@@ -24,7 +25,7 @@ const AddEntry: React.FC = () => {
     username: '',
     password: '',
     website: '',
-    folderId: 'no-folder',
+    folderId: preSelectedFolder || 'no-folder',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
