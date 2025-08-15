@@ -75,15 +75,23 @@ const SortableEntry: React.FC<SortableEntryProps> = ({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0.3 : 1,
+    zIndex: isDragging ? 50 : 1,
+    scale: isDragging ? '1.02' : '1',
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
-      <Card className="border-vault-outline hover:border-vault-outline-hover transition-vault-smooth hover:shadow-vault group">
+    <div ref={setNodeRef} style={style}>
+      <Card className={`border-vault-outline hover:border-vault-outline-hover transition-vault-smooth hover:shadow-vault group ${
+        isDragging ? 'shadow-vault-hover border-vault-outline-active' : ''
+      }`}>
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
-            <div className="flex-1 min-w-0" {...listeners}>
+            <div 
+              className="flex-1 min-w-0 cursor-grab active:cursor-grabbing" 
+              {...attributes} 
+              {...listeners}
+            >
               <div className="flex items-center gap-3 mb-2">
                 <div className="flex-shrink-0">
                   <User className="w-4 h-4 text-muted-foreground" />
@@ -163,7 +171,7 @@ interface SortableFolderProps {
   folder: VaultFolder;
   isSelected: boolean;
   entryCount: number;
-  onClick: () => void;
+  onClick: (e?: React.MouseEvent) => void;
   onEdit: (folder: VaultFolder) => void;
   onDelete: (id: string) => void;
 }
@@ -172,7 +180,7 @@ interface FolderDropZoneProps {
   folder: VaultFolder;
   isSelected: boolean;
   entryCount: number;
-  onClick: () => void;
+  onClick: (e?: React.MouseEvent) => void;
   onEdit: (folder: VaultFolder) => void;
   onDelete: (id: string) => void;
   isOver: boolean;
@@ -196,7 +204,7 @@ const FolderDropZone: React.FC<FolderDropZoneProps> = ({
       <Button
         variant={isSelected ? "vault-primary" : "vault"}
         className={`flex-col h-auto p-3 min-w-[80px] group relative transition-vault-smooth ${
-          isOver ? 'ring-2 ring-vault-outline-active scale-105' : ''
+          isOver ? 'ring-2 ring-vault-outline-active scale-105 bg-vault-hover' : ''
         }`}
         onClick={onClick}
       >
@@ -240,25 +248,38 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: folder.id });
+  } = useSortable({ 
+    id: folder.id,
+    disabled: false,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0.3 : 1,
+    zIndex: isDragging ? 50 : 1,
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    // Only trigger onClick if we're not dragging
+    if (!isDragging) {
+      onClick();
+    }
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <FolderDropZone
-        folder={folder}
-        isSelected={isSelected}
-        entryCount={entryCount}
-        onClick={onClick}
-        onEdit={onEdit}
-        onDelete={onDelete}
-        isOver={isOver}
-      />
+    <div ref={setNodeRef} style={style}>
+      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+        <FolderDropZone
+          folder={folder}
+          isSelected={isSelected}
+          entryCount={entryCount}
+          onClick={handleClick}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          isOver={isOver}
+        />
+      </div>
     </div>
   );
 };
@@ -275,7 +296,11 @@ const Vault: React.FC = () => {
   const [overId, setOverId] = useState<string | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // 5px movement required to start drag
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -586,8 +611,27 @@ const Vault: React.FC = () => {
               </SortableContext>
               <DragOverlay>
                 {activeId ? (
-                  <div className="opacity-75">
-                    {/* Render overlay content */}
+                  <div className="opacity-90 transform rotate-3 scale-105">
+                    {/* Render folder or entry being dragged */}
+                    {sortedFolders.find(f => f.id === activeId) ? (
+                      <Button variant="vault-primary" className="flex-col h-auto p-3 min-w-[80px] shadow-vault-hover">
+                        <Folder className="w-6 h-6 mb-1" />
+                        <span className="text-xs truncate max-w-full">
+                          {sortedFolders.find(f => f.id === activeId)?.name}
+                        </span>
+                      </Button>
+                    ) : (
+                      <Card className="border-vault-outline-active shadow-vault-hover bg-background">
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3">
+                            <User className="w-4 h-4 text-muted-foreground" />
+                            <h3 className="font-medium truncate">
+                              {filteredEntries.find(e => e.id === activeId)?.title || 'Entry'}
+                            </h3>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
                   </div>
                 ) : null}
               </DragOverlay>
