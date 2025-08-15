@@ -98,7 +98,7 @@ const Login: React.FC = () => {
 
   const isValidInput = () => {
     if (authType === 'pin') {
-      return pin.length >= 4;
+      return pin.length >= 6;
     } else {
       return password.length >= 6;
     }
@@ -257,7 +257,7 @@ const Login: React.FC = () => {
             </CardTitle>
             <CardDescription>
               {authType === 'pin' 
-                ? (isNewVault ? 'Choose a secure PIN (4-8 digits)' : 'Your vault is encrypted and stored locally')
+                ? (isNewVault ? 'Choose a secure PIN (min 6 digits)' : 'Your vault is encrypted and stored locally')
                 : (isNewVault ? 'Choose a secure password (min 6 characters)' : 'Your vault is encrypted and stored locally')
               }
             </CardDescription>
@@ -339,21 +339,15 @@ const Login: React.FC = () => {
                   <p className="font-medium">Requirements:</p>
                   <div className="space-y-1">
                     {authType === 'pin' ? (
-                      <div className={`flex items-center gap-2 ${pin.length >= 4 ? 'text-foreground' : 'text-muted-foreground'}`}>
-                        <div className={`w-2 h-2 rounded-full ${pin.length >= 4 ? 'bg-foreground' : 'bg-muted-foreground'}`} />
-                        At least 4 digits
+                      <div className={`flex items-center gap-2 ${pin.length >= 6 ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        <div className={`w-2 h-2 rounded-full ${pin.length >= 6 ? 'bg-foreground' : 'bg-muted-foreground'}`} />
+                        At least 6 digits
                       </div>
                     ) : (
-                      <>
-                        <div className={`flex items-center gap-2 ${password.length >= 6 ? 'text-foreground' : 'text-muted-foreground'}`}>
-                          <div className={`w-2 h-2 rounded-full ${password.length >= 6 ? 'bg-foreground' : 'bg-muted-foreground'}`} />
-                          At least 6 characters
-                        </div>
-                        <div className={`flex items-center gap-2 ${/[a-zA-Z]/.test(password) ? 'text-foreground' : 'text-muted-foreground'}`}>
-                          <div className={`w-2 h-2 rounded-full ${/[a-zA-Z]/.test(password) ? 'bg-foreground' : 'bg-muted-foreground'}`} />
-                          Contains letters
-                        </div>
-                      </>
+                      <div className={`flex items-center gap-2 ${password.length >= 6 ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        <div className={`w-2 h-2 rounded-full ${password.length >= 6 ? 'bg-foreground' : 'bg-muted-foreground'}`} />
+                        At least 6 characters only
+                      </div>
                     )}
                   </div>
                 </div>

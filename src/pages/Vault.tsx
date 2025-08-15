@@ -497,15 +497,16 @@ const Vault: React.FC = () => {
           </div>
         </div>
 
-        {/* Folders */}
-        <div className="mb-6 vault-slide-up">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDragEnd={handleDragEnd}
-          >
+        {/* Single DndContext for both folders and entries */}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+        >
+          {/* Folders */}
+          <div className="mb-6 vault-slide-up">
             <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1 scrollbar-thin">
               <Button
                 variant={selectedFolder === null ? "vault-primary" : "vault"}
@@ -545,67 +546,46 @@ const Vault: React.FC = () => {
                 <span className="text-xs">New</span>
               </Button>
             </div>
-            
-            <DragOverlay>
-              {activeId && sortedFolders.find(f => f.id === activeId) ? (
-                <div className="opacity-90 transform scale-105 transition-transform">
-                  <Button variant="vault-primary" className="flex-col h-auto p-3 min-w-[80px] shadow-vault-hover rotate-3">
-                    <Folder className="w-6 h-6 mb-1" />
-                    <span className="text-xs truncate max-w-full">
-                      {sortedFolders.find(f => f.id === activeId)?.name}
-                    </span>
-                  </Button>
-                </div>
-              ) : null}
-            </DragOverlay>
-          </DndContext>
-        </div>
+          </div>
 
-        {/* Add Entry Button */}
-        <div className="mb-6 text-center vault-slide-up">
-          <Button
-            variant="vault-primary"
-            size="lg"
-            onClick={() => navigate('/add-entry')}
-            className="w-full max-w-md"
-          >
-            <Plus className="w-5 h-5" />
-            Add New Entry
-          </Button>
-        </div>
-
-        {/* Entries */}
-        <div className="vault-slide-up">
-          {filteredEntries.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full border border-vault-outline flex items-center justify-center">
-                <Shield className="w-8 h-8 text-muted-foreground" />
-              </div>
-              <h3 className="text-lg font-medium mb-2">No entries found</h3>
-              <p className="text-muted-foreground mb-4">
-                {searchTerm 
-                  ? 'Try adjusting your search terms' 
-                  : 'Add your first password entry to get started'
-                }
-              </p>
-              {!searchTerm && (
-                <Button
-                  variant="vault"
-                  onClick={() => navigate('/add-entry')}
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Entry
-                </Button>
-              )}
-            </div>
-          ) : (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDragEnd={handleDragEnd}
+          {/* Add Entry Button */}
+          <div className="mb-6 text-center vault-slide-up">
+            <Button
+              variant="vault-primary"
+              size="lg"
+              onClick={() => navigate('/add-entry')}
+              className="w-full max-w-md"
             >
+              <Plus className="w-5 h-5" />
+              Add New Entry
+            </Button>
+          </div>
+
+          {/* Entries */}
+          <div className="vault-slide-up">
+            {filteredEntries.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full border border-vault-outline flex items-center justify-center">
+                  <Shield className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-medium mb-2">No entries found</h3>
+                <p className="text-muted-foreground mb-4">
+                  {searchTerm 
+                    ? 'Try adjusting your search terms' 
+                    : 'Add your first password entry to get started'
+                  }
+                </p>
+                {!searchTerm && (
+                  <Button
+                    variant="vault"
+                    onClick={() => navigate('/add-entry')}
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Entry
+                  </Button>
+                )}
+              </div>
+            ) : (
               <SortableContext
                 items={filteredEntries.map(e => e.id)}
                 strategy={verticalListSortingStrategy}
@@ -624,35 +604,37 @@ const Vault: React.FC = () => {
                   ))}
                 </div>
               </SortableContext>
-              <DragOverlay>
-                {activeId ? (
-                  <div className="opacity-90 transform scale-105 transition-transform">
-                    {/* Render folder or entry being dragged */}
-                    {sortedFolders.find(f => f.id === activeId) ? (
-                      <Button variant="vault-primary" className="flex-col h-auto p-3 min-w-[80px] shadow-vault-hover">
-                        <Folder className="w-6 h-6 mb-1" />
-                        <span className="text-xs truncate max-w-full">
-                          {sortedFolders.find(f => f.id === activeId)?.name}
-                        </span>
-                      </Button>
-                    ) : (
-                      <Card className="border-vault-outline-active shadow-vault-hover bg-background">
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-3">
-                            <User className="w-4 h-4 text-muted-foreground" />
-                            <h3 className="font-medium truncate">
-                              {filteredEntries.find(e => e.id === activeId)?.title || 'Entry'}
-                            </h3>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                ) : null}
-              </DragOverlay>
-            </DndContext>
-          )}
-        </div>
+            )}
+          </div>
+
+          {/* Single DragOverlay for both folders and entries */}
+          <DragOverlay>
+            {activeId ? (
+              <div className="opacity-90 transform scale-105 transition-transform">
+                {/* Render folder or entry being dragged */}
+                {sortedFolders.find(f => f.id === activeId) ? (
+                  <Button variant="vault-primary" className="flex-col h-auto p-3 min-w-[80px] shadow-vault-hover rotate-3">
+                    <Folder className="w-6 h-6 mb-1" />
+                    <span className="text-xs truncate max-w-full">
+                      {sortedFolders.find(f => f.id === activeId)?.name}
+                    </span>
+                  </Button>
+                ) : (
+                  <Card className="border-vault-outline-active shadow-vault-hover bg-background">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        <h3 className="font-medium truncate">
+                          {filteredEntries.find(e => e.id === activeId)?.title || 'Entry'}
+                        </h3>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       </div>
     </div>
   );
