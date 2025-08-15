@@ -1,0 +1,14 @@
+{
+  "appId": "app.lovable.117dfa96d33d4b0f80d371c3d0a0fa46",
+  "appName": "simple-offline-keys",
+  "webDir": "dist",
+  "server": {
+    "url": "https://117dfa96-d33d-4b0f-80d3-71c3d0a0fa46.lovableproject.com?forceHideBadge=true",
+    "cleartext": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
+}
