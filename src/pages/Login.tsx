@@ -112,7 +112,7 @@ const Login: React.FC = () => {
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full border border-vault-outline mb-6 bg-gradient-to-br from-vault-outline/20 to-transparent">
             <Shield className="w-10 h-10" />
           </div>
-          <h1 className="text-4xl font-bold mb-4">Welcome to OfflineVault</h1>
+          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-foreground via-muted-foreground to-foreground bg-clip-text text-transparent">Welcome to OfflineVault</h1>
           <p className="text-lg text-muted-foreground mb-8">
             Your secure, offline password manager that keeps your data completely private and stored only on your device.
           </p>
@@ -368,18 +368,14 @@ const Login: React.FC = () => {
             </form>
 
             {isNewVault && (
-              <div className="mt-6 p-4 rounded-lg bg-vault-warning/10 border border-vault-warning/20">
-                <p className="text-sm text-vault-warning font-medium">
+              <div className="mt-6 p-4 rounded-lg border border-foreground/20 bg-background">
+                <p className="text-sm font-medium">
                   ⚠️ Important: Remember your {authType}. There is no recovery option for offline vaults.
                 </p>
               </div>
             )}
           </CardContent>
         </Card>
-
-        <div className="text-center mt-6 text-sm text-muted-foreground">
-          <p>🔒 All data is encrypted and stored locally on your device</p>
-        </div>
       </div>
     </div>
   );
