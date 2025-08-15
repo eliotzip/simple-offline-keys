@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-vault-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -13,21 +13,25 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-vault-outline bg-transparent text-foreground hover:border-vault-outline-hover hover:bg-vault-outline/10",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        vault: "border border-vault-outline bg-transparent text-foreground hover:border-vault-outline-active hover:bg-primary hover:text-primary-foreground transition-vault-smooth",
+        "vault-primary": "bg-primary text-primary-foreground border border-primary hover:bg-transparent hover:text-primary transition-vault-smooth",
+        "vault-danger": "border border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground transition-vault-smooth",
       },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
+        "vault-pin": "h-12 w-12 rounded-lg text-lg font-semibold",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "vault",
       size: "default",
     },
   }
