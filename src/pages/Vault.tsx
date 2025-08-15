@@ -102,20 +102,14 @@ const SortableEntry: React.FC<SortableEntryProps> = ({
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                {isMobile && (
-                  <div 
-                    className="cursor-grab active:cursor-grabbing p-1 -ml-1"
-                    {...attributes} 
-                    {...listeners}
-                  >
-                    <DragHandle className="text-muted-foreground" />
-                  </div>
-                )}
                 <div 
-                  className={`flex-1 min-w-0 ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''}`}
-                  {...(!isMobile ? attributes : {})} 
-                  {...(!isMobile ? listeners : {})}
+                  className="cursor-grab active:cursor-grabbing p-1 -ml-1"
+                  {...attributes} 
+                  {...listeners}
                 >
+                  <DragHandle className="text-muted-foreground" />
+                </div>
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="flex-shrink-0">
                       <User className="w-4 h-4 text-muted-foreground" />
@@ -301,9 +295,9 @@ const FolderDropZone: React.FC<FolderDropZoneProps> = ({
     <div ref={setNodeRef} className="relative w-full h-full">
       <Button
         variant={isSelected ? "vault-primary" : "vault"}
-        className={`w-full h-full flex-col p-3 min-w-[80px] group relative transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg ${
-          isOver ? 'ring-2 ring-vault-outline-active scale-110 bg-vault-hover border-vault-outline-active shadow-xl' : ''
-        } ${isSelected ? 'shadow-lg border-2 border-vault-outline-active' : 'border-vault-outline hover:border-vault-outline-hover'}`}
+        className={`w-full h-full flex-col p-3 min-w-[80px] group relative transition-all duration-200 ease-in-out ${
+          isOver ? 'ring-2 ring-vault-outline-active bg-vault-hover border-vault-outline-active shadow-xl' : ''
+        } ${isSelected ? 'shadow-lg border-2 border-vault-outline-active' : 'border-vault-outline hover:border-vault-outline-hover hover:shadow-lg'}`}
         onClick={onClick}
       >
         <div className="relative">
@@ -362,7 +356,6 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
     transform: CSS.Transform.toString(transform),
     transition: isDragging ? 'none' : 'transform 0.2s ease',
     zIndex: isDragging ? 1000 : 1,
-    scale: isDragging ? '1.05' : '1',
     opacity: isDragging ? 0.8 : 1,
   };
 
@@ -375,20 +368,14 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
   return (
     <div ref={setNodeRef} style={style} className="min-w-[80px]">
       <div className="relative w-full h-full">
-        {isMobile && (
-          <div 
-            className="absolute top-1 left-1 z-10 cursor-grab active:cursor-grabbing p-1 bg-background/80 rounded"
-            {...attributes} 
-            {...listeners}
-          >
-            <DragHandle className="text-muted-foreground" />
-          </div>
-        )}
         <div 
-          {...(!isMobile ? attributes : {})} 
-          {...(!isMobile ? listeners : {})} 
-          className={`w-full h-full ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''}`}
+          className="absolute top-1 left-1 z-10 cursor-grab active:cursor-grabbing p-1 bg-background/80 rounded"
+          {...attributes} 
+          {...listeners}
         >
+          <DragHandle className="text-muted-foreground" />
+        </div>
+        <div className="w-full h-full">
           <FolderDropZone
             folder={folder}
             isSelected={isSelected}
