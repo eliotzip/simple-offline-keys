@@ -44,6 +44,10 @@ export class VaultCrypto {
       const salt = this.generateSalt();
       const key = this.deriveKey(pin, salt);
       
+      // Store auth type for later detection
+      const authType = /^\d+$/.test(pin) ? 'pin' : 'password';
+      localStorage.setItem('vault-auth-type', authType);
+      
       const initialData: VaultData = {
         entries: [],
         folders: []
@@ -59,6 +63,10 @@ export class VaultCrypto {
       console.error('Failed to initialize vault:', error);
       return false;
     }
+  }
+
+  static getAuthType(): 'pin' | 'password' | null {
+    return localStorage.getItem('vault-auth-type') as 'pin' | 'password' | null;
   }
 
   static async unlockVault(pin: string): Promise<VaultData | null> {

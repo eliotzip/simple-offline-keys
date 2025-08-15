@@ -3,8 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useVault } from '@/contexts/VaultContext';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { copyToClipboard, VaultEntry, VaultFolder } from '@/lib/crypto';
 import { 
   Search, 
@@ -19,7 +21,8 @@ import {
   Eye,
   EyeOff,
   Shield,
-  MoreVertical
+  MoreVertical,
+  GripVertical
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -65,6 +68,8 @@ const SortableEntry: React.FC<SortableEntryProps> = ({
   onTogglePassword,
   showPassword,
 }) => {
+  const isMobile = useIsMobile();
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const {
     attributes,
     listeners,
@@ -82,90 +87,140 @@ const SortableEntry: React.FC<SortableEntryProps> = ({
     scale: isDragging ? '1.02' : '1',
   };
 
+  const handleDelete = () => {
+    setConfirmDeleteOpen(false);
+    onDelete(entry.id);
+  };
+
   return (
-    <div ref={setNodeRef} style={style}>
-      <Card className={`border-vault-outline hover:border-vault-outline-hover transition-vault-smooth hover:shadow-vault group ${
-        isDragging ? 'shadow-vault-hover border-vault-outline-active' : ''
-      }`}>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div 
-              className="flex-1 min-w-0 cursor-grab active:cursor-grabbing" 
-              {...attributes} 
-              {...listeners}
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <div className="flex-shrink-0">
-                  <User className="w-4 h-4 text-muted-foreground" />
-                </div>
-                <h3 className="font-medium truncate">{entry.title}</h3>
-              </div>
-              <div className="space-y-1 text-sm text-muted-foreground">
-                <p className="truncate">
-                  <span className="font-mono">{entry.username}</span>
-                </p>
-                {entry.website && (
-                  <p className="truncate">{entry.website}</p>
+    <>
+      <div ref={setNodeRef} style={style}>
+        <Card className={`border-vault-outline hover:border-vault-outline-hover transition-vault-smooth hover:shadow-vault group ${
+          isDragging ? 'shadow-vault-hover border-vault-outline-active' : ''
+        }`}>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                {isMobile && (
+                  <div 
+                    className="cursor-grab active:cursor-grabbing p-1 -ml-1"
+                    {...attributes} 
+                    {...listeners}
+                  >
+                    <GripVertical className="w-4 h-4 text-muted-foreground" />
+                  </div>
                 )}
+                <div 
+                  className={`flex-1 min-w-0 ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''}`}
+                  {...(!isMobile ? attributes : {})} 
+                  {...(!isMobile ? listeners : {})}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="flex-shrink-0">
+                      <User className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                    <h3 className="font-medium truncate">{entry.title}</h3>
+                  </div>
+                  <div className="space-y-1 text-sm text-muted-foreground">
+                    <p className="truncate">
+                      <span className="font-mono">{entry.username}</span>
+                    </p>
+                    {entry.website && (
+                      <p className="truncate">{entry.website}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div className={`flex items-center gap-1 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCopy(entry.username, 'Username');
+                  }}
+                >
+                  <User className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onTogglePassword(entry.id);
+                  }}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCopy(entry.password, 'Password');
+                  }}
+                >
+                  <Copy className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(entry);
+                  }}
+                >
+                  <Edit3 className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-destructive hover:text-destructive-foreground hover:bg-destructive"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setConfirmDeleteOpen(true);
+                  }}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
               </div>
             </div>
             
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => onCopy(entry.username, 'Username')}
-              >
-                <User className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => onTogglePassword(entry.id)}
-              >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => onCopy(entry.password, 'Password')}
-              >
-                <Copy className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => onEdit(entry)}
-              >
-                <Edit3 className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-destructive hover:text-destructive-foreground hover:bg-destructive"
-                onClick={() => onDelete(entry.id)}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-          
-          {showPassword && (
-            <div className="mt-2 p-2 bg-muted rounded font-mono text-sm border">
-              {entry.password}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+            {showPassword && (
+              <div className="mt-2 p-2 bg-muted rounded font-mono text-sm border">
+                {entry.password}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <AlertDialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Entry</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{entry.title}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={handleDelete}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
@@ -236,6 +291,7 @@ const FolderDropZone: React.FC<FolderDropZoneProps> = ({
   onDelete,
   isOver,
 }) => {
+  const isMobile = useIsMobile();
   const { setNodeRef } = useDroppable({
     id: `folder-drop-${folder.id}`,
   });
@@ -244,19 +300,28 @@ const FolderDropZone: React.FC<FolderDropZoneProps> = ({
     <div ref={setNodeRef} className="relative w-full h-full">
       <Button
         variant={isSelected ? "vault-primary" : "vault"}
-        className={`w-full h-full flex-col p-3 min-w-[80px] group relative transition-vault-smooth ${
-          isOver ? 'ring-2 ring-vault-outline-active scale-105 bg-vault-hover border-vault-outline-active' : ''
-        }`}
+        className={`w-full h-full flex-col p-3 min-w-[80px] group relative transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg ${
+          isOver ? 'ring-2 ring-vault-outline-active scale-110 bg-vault-hover border-vault-outline-active shadow-xl' : ''
+        } ${isSelected ? 'shadow-lg border-2 border-vault-outline-active' : 'border-vault-outline hover:border-vault-outline-hover'}`}
         onClick={onClick}
       >
-        <Folder className="w-6 h-6 mb-1" />
-        <span className="text-xs truncate max-w-full">{folder.name}</span>
+        <div className="relative">
+          <Folder className={`w-8 h-8 mb-2 transition-all duration-300 ${
+            isOver ? 'animate-bounce' : ''
+          } ${isSelected ? 'text-vault-primary-foreground' : 'text-vault-outline group-hover:text-vault-outline-hover'}`} />
+          {entryCount > 0 && (
+            <div className="absolute -top-1 -right-1 bg-vault-primary text-vault-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {entryCount}
+            </div>
+          )}
+        </div>
+        <span className="text-xs truncate max-w-full font-medium">{folder.name}</span>
         
-        <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className={`absolute top-1 right-1 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
           <Button
             variant="ghost"
             size="icon"
-            className="h-5 w-5 text-muted-foreground hover:text-foreground"
+            className="h-6 w-6 text-muted-foreground hover:text-foreground bg-background/80 hover:bg-background rounded-full"
             onClick={(e) => {
               e.stopPropagation();
               onEdit(folder);
@@ -279,6 +344,7 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
   onDelete,
   isOver,
 }) => {
+  const isMobile = useIsMobile();
   const {
     attributes,
     listeners,
@@ -291,15 +357,15 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
     disabled: false,
   });
 
-  // Simplified real-time style with no animation delays
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition: 'none', // No transition for immediate positioning
+    transition: isDragging ? 'none' : 'transform 0.2s ease',
     zIndex: isDragging ? 1000 : 1,
+    scale: isDragging ? '1.05' : '1',
+    opacity: isDragging ? 0.8 : 1,
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    // Only trigger onClick if we're not dragging
     if (!isDragging) {
       onClick();
     }
@@ -307,16 +373,31 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
 
   return (
     <div ref={setNodeRef} style={style} className="min-w-[80px]">
-      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing w-full h-full">
-        <FolderDropZone
-          folder={folder}
-          isSelected={isSelected}
-          entryCount={entryCount}
-          onClick={handleClick}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          isOver={isOver}
-        />
+      <div className="relative w-full h-full">
+        {isMobile && (
+          <div 
+            className="absolute top-1 left-1 z-10 cursor-grab active:cursor-grabbing p-1"
+            {...attributes} 
+            {...listeners}
+          >
+            <GripVertical className="w-3 h-3 text-muted-foreground bg-background/80 rounded" />
+          </div>
+        )}
+        <div 
+          {...(!isMobile ? attributes : {})} 
+          {...(!isMobile ? listeners : {})} 
+          className={`w-full h-full ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''}`}
+        >
+          <FolderDropZone
+            folder={folder}
+            isSelected={isSelected}
+            entryCount={entryCount}
+            onClick={handleClick}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            isOver={isOver}
+          />
+        </div>
       </div>
     </div>
   );
@@ -326,6 +407,7 @@ const Vault: React.FC = () => {
   const { data, lock, deleteEntry, reorderEntries, reorderFolders, createFolder, deleteFolder, moveEntryToFolder, updateFolder } = useVault();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);

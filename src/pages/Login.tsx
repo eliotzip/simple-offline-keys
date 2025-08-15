@@ -28,6 +28,11 @@ const Login: React.FC = () => {
     const welcomed = localStorage.getItem('vault-welcomed');
     
     if (vaultExists) {
+      // Detect the existing auth type and set it
+      const existingAuthType = VaultCrypto.getAuthType();
+      if (existingAuthType) {
+        setAuthType(existingAuthType);
+      }
       setCurrentStep('existing');
     } else if (welcomed) {
       setCurrentStep('choose-auth');
@@ -218,7 +223,16 @@ const Login: React.FC = () => {
     );
   }
 
-  // Main Authentication Forms
+  // Main Authentication Forms - redirect to correct auth method for existing vault
+  if (currentStep === 'existing') {
+    const currentAuthType = VaultCrypto.getAuthType();
+    if (currentAuthType && currentAuthType !== authType) {
+      setAuthType(currentAuthType);
+      setCurrentStep(currentAuthType);
+      return null; // Re-render with correct auth type
+    }
+  }
+
   const isNewVault = currentStep !== 'existing';
   const pageTitle = authType === 'pin' ? 'Create PIN' : 'Create Password';
   const existingTitle = authType === 'pin' ? 'Enter PIN' : 'Enter Password';
