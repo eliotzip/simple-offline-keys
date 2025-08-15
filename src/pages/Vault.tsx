@@ -200,16 +200,16 @@ const FolderDropZone: React.FC<FolderDropZoneProps> = ({
   });
 
   return (
-    <div ref={setNodeRef}>
+    <div ref={setNodeRef} className="relative w-full h-full">
       <Button
         variant={isSelected ? "vault-primary" : "vault"}
-        className={`flex-col h-auto p-3 min-w-[80px] group relative transition-vault-smooth ${
-          isOver ? 'ring-2 ring-vault-outline-active scale-105 bg-vault-hover' : ''
+        className={`w-full h-full flex-col p-3 min-w-[80px] group relative transition-vault-smooth ${
+          isOver ? 'ring-2 ring-vault-outline-active scale-105 bg-vault-hover border-vault-outline-active' : ''
         }`}
         onClick={onClick}
       >
         <Folder className="w-6 h-6 mb-1" />
-                <span className="text-xs truncate max-w-full">{folder.name}</span>
+        <span className="text-xs truncate max-w-full">{folder.name}</span>
         
         <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button
@@ -252,9 +252,10 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
+    transition: isDragging ? 'none' : transition, // Disable transition while dragging for real-time movement
+    opacity: isDragging ? 0.7 : 1,
     zIndex: isDragging ? 50 : 1,
+    scale: isDragging ? '1.05' : '1',
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -265,8 +266,8 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
   };
 
   return (
-    <div ref={setNodeRef} style={style}>
-      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+    <div ref={setNodeRef} style={style} className="min-w-[80px]">
+      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing w-full h-full">
         <FolderDropZone
           folder={folder}
           isSelected={isSelected}
@@ -413,7 +414,7 @@ const Vault: React.FC = () => {
       const folderId = over.id.replace('folder-drop-', '');
       const entryId = active.id as string;
       
-      // Check if it's an entry being dragged
+      // Check if it's an entry being dragged (look in all entries, not just filtered ones)
       if (data?.entries.find(e => e.id === entryId)) {
         const success = await moveEntryToFolder(entryId, folderId);
         if (success) {
@@ -510,7 +511,7 @@ const Vault: React.FC = () => {
             <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1 scrollbar-thin">
               <Button
                 variant={selectedFolder === null ? "vault-primary" : "vault"}
-                className="flex-col h-auto p-3 min-w-[80px]"
+                className="flex-col h-auto p-3 min-w-[80px] flex-shrink-0"
                 onClick={() => setSelectedFolder(null)}
               >
                 <Folder className="w-6 h-6 mb-1" />
@@ -539,7 +540,7 @@ const Vault: React.FC = () => {
 
               <Button
                 variant="vault"
-                className="flex-col h-auto p-3 min-w-[80px]"
+                className="flex-col h-auto p-3 min-w-[80px] flex-shrink-0"
                 onClick={handleCreateFolder}
               >
                 <FolderPlus className="w-6 h-6 mb-1" />
