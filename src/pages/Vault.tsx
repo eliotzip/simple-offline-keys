@@ -82,37 +82,37 @@ const SortableEntry: React.FC<SortableEntryProps> = ({
 
   return (
     <div ref={setNodeRef} style={style}>
-      <Card className={`border-vault-outline hover:border-vault-outline-hover transition-vault-smooth hover:shadow-vault group ${
-        isDragging ? 'shadow-vault-hover border-vault-outline-active' : ''
+      <Card className={`border-glass-border hover:shadow-glow transition-all duration-300 hover:scale-105 group ${
+        isDragging ? 'shadow-glow border-primary scale-105' : ''
       }`}>
-        <CardContent className="p-4">
+        <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div 
               className="flex-1 min-w-0 cursor-grab active:cursor-grabbing" 
               {...attributes} 
               {...listeners}
             >
-              <div className="flex items-center gap-3 mb-2">
-                <div className="flex-shrink-0">
-                  <User className="w-4 h-4 text-muted-foreground" />
+              <div className="flex items-center gap-4 mb-3">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center">
+                  <User className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="font-medium truncate">{entry.title}</h3>
+                <h3 className="font-semibold text-lg truncate">{entry.title}</h3>
               </div>
-              <div className="space-y-1 text-sm text-muted-foreground">
-                <p className="truncate">
-                  <span className="font-mono">{entry.username}</span>
+              <div className="space-y-2 text-muted-foreground ml-14">
+                <p className="truncate font-mono text-sm">
+                  {entry.username}
                 </p>
                 {entry.website && (
-                  <p className="truncate">{entry.website}</p>
+                  <p className="truncate text-sm">{entry.website}</p>
                 )}
               </div>
             </div>
             
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-4">
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-10 w-10 rounded-full"
                 onClick={() => onCopy(entry.username, 'Username')}
               >
                 <User className="w-4 h-4" />
@@ -120,7 +120,7 @@ const SortableEntry: React.FC<SortableEntryProps> = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-10 w-10 rounded-full"
                 onClick={() => onTogglePassword(entry.id)}
               >
                 {showPassword ? (
@@ -132,7 +132,7 @@ const SortableEntry: React.FC<SortableEntryProps> = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-10 w-10 rounded-full"
                 onClick={() => onCopy(entry.password, 'Password')}
               >
                 <Copy className="w-4 h-4" />
@@ -140,7 +140,7 @@ const SortableEntry: React.FC<SortableEntryProps> = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-10 w-10 rounded-full"
                 onClick={() => onEdit(entry)}
               >
                 <Edit3 className="w-4 h-4" />
@@ -148,7 +148,7 @@ const SortableEntry: React.FC<SortableEntryProps> = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-destructive hover:text-destructive-foreground hover:bg-destructive"
+                className="h-10 w-10 rounded-full text-destructive hover:text-destructive-foreground hover:bg-destructive"
                 onClick={() => onDelete(entry.id)}
               >
                 <Trash2 className="w-4 h-4" />
@@ -157,7 +157,7 @@ const SortableEntry: React.FC<SortableEntryProps> = ({
           </div>
           
           {showPassword && (
-            <div className="mt-2 p-2 bg-muted rounded font-mono text-sm border">
+            <div className="mt-4 p-4 glass rounded-xl font-mono text-sm border border-glass-border ml-14">
               {entry.password}
             </div>
           )}
@@ -202,20 +202,20 @@ const FolderDropZone: React.FC<FolderDropZoneProps> = ({
   return (
     <div ref={setNodeRef} className="relative w-full h-full">
       <Button
-        variant={isSelected ? "vault-primary" : "vault"}
-        className={`w-full h-full flex-col p-3 min-w-[80px] group relative transition-vault-smooth ${
-          isOver ? 'ring-2 ring-vault-outline-active scale-105 bg-vault-hover border-vault-outline-active' : ''
+        variant={isSelected ? "primary" : "outline"}
+        className={`w-full h-full flex-col p-4 min-w-[100px] rounded-2xl transition-all duration-300 ${
+          isOver ? 'ring-2 ring-primary scale-105 shadow-glow' : ''
         }`}
         onClick={onClick}
       >
-        <Folder className="w-6 h-6 mb-1" />
-        <span className="text-xs truncate max-w-full">{folder.name}</span>
+        <Folder className="w-7 h-7 mb-2" />
+        <span className="text-sm font-medium truncate max-w-full">{folder.name}</span>
         
-        <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button
             variant="ghost"
             size="icon"
-            className="h-5 w-5 text-destructive"
+            className="h-6 w-6 text-destructive rounded-full"
             onClick={(e) => {
               e.stopPropagation();
               onDelete(folder.id);
@@ -266,7 +266,7 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="min-w-[80px]">
+    <div ref={setNodeRef} style={style} className="min-w-[100px]">
       <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing w-full h-full">
         <FolderDropZone
           folder={folder}
@@ -466,34 +466,38 @@ const Vault: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen p-4">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 vault-fade-in">
-          <div className="flex items-center gap-3">
-            <Shield className="w-8 h-8" />
+        <div className="flex items-center justify-between mb-8 fade-in">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full glass border-glass-border flex items-center justify-center shadow-glow">
+              <Shield className="w-6 h-6 text-primary" />
+            </div>
             <div>
-              <h1 className="text-2xl font-bold">OfflineVault</h1>
-              <p className="text-sm text-muted-foreground">
+              <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                OfflineVault
+              </h1>
+              <p className="text-muted-foreground">
                 {data.entries.length} entries • {data.folders.length} folders
               </p>
             </div>
           </div>
-          <Button variant="vault" onClick={handleLogout}>
-            <LogOut className="w-4 h-4" />
+          <Button variant="accent" onClick={handleLogout} className="glass-button">
+            <LogOut className="w-5 h-5" />
             Lock Vault
           </Button>
         </div>
 
         {/* Search */}
-        <div className="mb-6 vault-slide-up">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <div className="mb-8 slide-up">
+          <div className="relative max-w-2xl mx-auto">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
               placeholder="Search entries..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-input border-vault-outline focus:border-vault-outline-active"
+              className="pl-12 h-14 text-lg"
             />
           </div>
         </div>
@@ -507,15 +511,15 @@ const Vault: React.FC = () => {
           onDragEnd={handleDragEnd}
         >
           {/* Folders */}
-          <div className="mb-6 vault-slide-up">
-            <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1 scrollbar-thin">
+          <div className="mb-8 slide-up">
+            <div className="flex items-center gap-3 mb-6 overflow-x-auto pb-2 scrollbar-glass">
               <Button
-                variant={selectedFolder === null ? "vault-primary" : "vault"}
-                className="flex-col h-auto p-3 min-w-[80px] flex-shrink-0"
+                variant={selectedFolder === null ? "primary" : "outline"}
+                className="flex-col h-auto p-4 min-w-[100px] flex-shrink-0 rounded-2xl"
                 onClick={() => setSelectedFolder(null)}
               >
-                <Folder className="w-6 h-6 mb-1" />
-                <span className="text-xs">All</span>
+                <Folder className="w-7 h-7 mb-2" />
+                <span className="text-sm font-medium">All</span>
               </Button>
 
               <SortableContext
@@ -539,38 +543,38 @@ const Vault: React.FC = () => {
               </SortableContext>
 
               <Button
-                variant="vault"
-                className="flex-col h-auto p-3 min-w-[80px] flex-shrink-0"
+                variant="outline"
+                className="flex-col h-auto p-4 min-w-[100px] flex-shrink-0 rounded-2xl border-dashed"
                 onClick={handleCreateFolder}
               >
-                <FolderPlus className="w-6 h-6 mb-1" />
-                <span className="text-xs">New</span>
+                <FolderPlus className="w-7 h-7 mb-2" />
+                <span className="text-sm font-medium">New</span>
               </Button>
             </div>
           </div>
 
           {/* Add Entry Button */}
-          <div className="mb-6 text-center vault-slide-up">
+          <div className="mb-8 text-center slide-up">
             <Button
-              variant="vault-primary"
+              variant="primary"
               size="lg"
               onClick={() => navigate('/add-entry')}
-              className="w-full max-w-md"
+              className="w-full max-w-md h-14 text-lg font-semibold rounded-2xl"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-6 h-6" />
               Add New Entry
             </Button>
           </div>
 
           {/* Entries */}
-          <div className="vault-slide-up">
+          <div className="slide-up">
             {filteredEntries.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full border border-vault-outline flex items-center justify-center">
-                  <Shield className="w-8 h-8 text-muted-foreground" />
+              <div className="text-center py-16">
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full glass border-glass-border flex items-center justify-center shadow-glow">
+                  <Shield className="w-10 h-10 text-primary" />
                 </div>
-                <h3 className="text-lg font-medium mb-2">No entries found</h3>
-                <p className="text-muted-foreground mb-4">
+                <h3 className="text-2xl font-semibold mb-4">No entries found</h3>
+                <p className="text-muted-foreground mb-8 text-lg">
                   {searchTerm 
                     ? 'Try adjusting your search terms' 
                     : 'Add your first password entry to get started'
@@ -578,10 +582,11 @@ const Vault: React.FC = () => {
                 </p>
                 {!searchTerm && (
                   <Button
-                    variant="vault"
+                    variant="accent"
                     onClick={() => navigate('/add-entry')}
+                    className="rounded-2xl"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-5 h-5" />
                     Add Entry
                   </Button>
                 )}
@@ -591,7 +596,7 @@ const Vault: React.FC = () => {
                 items={filteredEntries.map(e => e.id)}
                 strategy={verticalListSortingStrategy}
               >
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {filteredEntries.map((entry) => (
                     <SortableEntry
                       key={entry.id}
@@ -611,21 +616,23 @@ const Vault: React.FC = () => {
           {/* Single DragOverlay for both folders and entries */}
           <DragOverlay>
             {activeId ? (
-              <div className="opacity-90 transform scale-105 transition-transform">
+              <div className="opacity-90 transform scale-110 transition-transform">
                 {/* Render folder or entry being dragged */}
                 {sortedFolders.find(f => f.id === activeId) ? (
-                  <Button variant="vault-primary" className="flex-col h-auto p-3 min-w-[80px] shadow-vault-hover rotate-3">
-                    <Folder className="w-6 h-6 mb-1" />
-                    <span className="text-xs truncate max-w-full">
+                  <Button variant="primary" className="flex-col h-auto p-4 min-w-[100px] shadow-glow rotate-3 rounded-2xl">
+                    <Folder className="w-7 h-7 mb-2" />
+                    <span className="text-sm font-medium truncate max-w-full">
                       {sortedFolders.find(f => f.id === activeId)?.name}
                     </span>
                   </Button>
                 ) : (
-                  <Card className="border-vault-outline-active shadow-vault-hover bg-background">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <User className="w-4 h-4 text-muted-foreground" />
-                        <h3 className="font-medium truncate">
+                  <Card className="border-primary shadow-glow bg-background">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center">
+                          <User className="w-5 h-5 text-white" />
+                        </div>
+                        <h3 className="font-semibold text-lg truncate">
                           {filteredEntries.find(e => e.id === activeId)?.title || 'Entry'}
                         </h3>
                       </div>
