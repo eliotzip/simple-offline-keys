@@ -243,10 +243,8 @@ const FolderDropZone: React.FC<FolderDropZoneProps> = ({
   return (
     <div ref={setNodeRef} className="relative w-full h-full">
       <Button
-        variant="vault"
+        variant={isSelected ? "vault-primary" : "vault"}
         className={`w-full h-full flex-col p-3 min-w-[80px] group relative transition-vault-smooth ${
-          isSelected ? 'border-white text-white' : 'hover:border-white hover:text-white'
-        } ${
           isOver ? 'ring-2 ring-vault-outline-active scale-105 bg-vault-hover border-vault-outline-active' : ''
         }`}
         onClick={onClick}
@@ -293,14 +291,15 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
     disabled: false,
   });
 
-  // Real-time horizontal movement with no animation delays
+  // Simplified real-time style with no animation delays
   const style = {
-    transform: transform ? `translateX(${transform.x}px)` : undefined,
-    transition: 'none',
+    transform: CSS.Transform.toString(transform),
+    transition: 'none', // No transition for immediate positioning
     zIndex: isDragging ? 1000 : 1,
   };
 
   const handleClick = (e: React.MouseEvent) => {
+    // Only trigger onClick if we're not dragging
     if (!isDragging) {
       onClick();
     }
@@ -347,7 +346,7 @@ const Vault: React.FC = () => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 1, // Minimal distance for immediate response
+        distance: 3, // Reduced distance for better responsiveness
       },
     }),
     useSensor(KeyboardSensor, {
@@ -727,26 +726,31 @@ const Vault: React.FC = () => {
             )}
           </div>
 
-          {/* Simplified DragOverlay for horizontal movement */}
+          {/* Simplified DragOverlay - no animation effects */}
           <DragOverlay>
-            {activeId && sortedFolders.find(f => f.id === activeId) ? (
-              <Button variant="vault" className="flex-col h-auto p-3 min-w-[80px] shadow-vault-hover border-vault-outline-active">
-                <Folder className="w-6 h-6 mb-1" />
-                <span className="text-xs truncate max-w-full">
-                  {sortedFolders.find(f => f.id === activeId)?.name}
-                </span>
-              </Button>
-            ) : filteredEntries.find(e => e.id === activeId) ? (
-              <Card className="border-vault-outline-active shadow-vault-hover bg-background">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <User className="w-4 h-4 text-muted-foreground" />
-                    <h3 className="font-medium truncate">
-                      {filteredEntries.find(e => e.id === activeId)?.title || 'Entry'}
-                    </h3>
-                  </div>
-                </CardContent>
-              </Card>
+            {activeId ? (
+              <div>
+                {/* Render folder or entry being dragged */}
+                {sortedFolders.find(f => f.id === activeId) ? (
+                  <Button variant="vault-primary" className="flex-col h-auto p-3 min-w-[80px] shadow-vault-hover">
+                    <Folder className="w-6 h-6 mb-1" />
+                    <span className="text-xs truncate max-w-full">
+                      {sortedFolders.find(f => f.id === activeId)?.name}
+                    </span>
+                  </Button>
+                ) : (
+                  <Card className="border-vault-outline-active shadow-vault-hover bg-background">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        <h3 className="font-medium truncate">
+                          {filteredEntries.find(e => e.id === activeId)?.title || 'Entry'}
+                        </h3>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             ) : null}
           </DragOverlay>
         </DndContext>
