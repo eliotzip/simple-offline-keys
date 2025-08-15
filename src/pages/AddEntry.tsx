@@ -24,7 +24,7 @@ const AddEntry: React.FC = () => {
     username: '',
     password: '',
     website: '',
-    folderId: '',
+    folderId: 'no-folder',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +39,7 @@ const AddEntry: React.FC = () => {
           username: entry.username,
           password: entry.password,
           website: entry.website || '',
-          folderId: entry.folderId || '',
+          folderId: entry.folderId || 'no-folder',
         });
       }
     }
@@ -71,7 +71,7 @@ const AddEntry: React.FC = () => {
         username: formData.username.trim(),
         password: formData.password,
         website: formData.website.trim() || undefined,
-        folderId: formData.folderId || undefined,
+        folderId: formData.folderId === 'no-folder' ? undefined : formData.folderId || undefined,
         order: 0, // Will be set by the context
       };
 
@@ -116,7 +116,7 @@ const AddEntry: React.FC = () => {
         username: formData.username.trim(),
         password: formData.password || '(No password)',
         website: formData.website.trim() || undefined,
-        folderId: formData.folderId || undefined,
+        folderId: formData.folderId === 'no-folder' ? undefined : formData.folderId || undefined,
         order: 0,
       };
 
@@ -259,14 +259,14 @@ const AddEntry: React.FC = () => {
                 <div className="space-y-2">
                   <Label htmlFor="folder">Folder</Label>
                   <Select
-                    value={formData.folderId}
-                    onValueChange={(value) => setFormData({ ...formData, folderId: value })}
+                    value={formData.folderId || 'no-folder'}
+                    onValueChange={(value) => setFormData({ ...formData, folderId: value === 'no-folder' ? '' : value })}
                   >
                     <SelectTrigger className="bg-input border-vault-outline focus:border-vault-outline-active">
                       <SelectValue placeholder="Select a folder (optional)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">No folder</SelectItem>
+                      <SelectItem value="no-folder">No folder</SelectItem>
                       {sortedFolders.map((folder) => (
                         <SelectItem key={folder.id} value={folder.id}>
                           {folder.name}
