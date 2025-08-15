@@ -253,7 +253,7 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.3 : 1,
+    opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 50 : 1,
   };
 
@@ -506,18 +506,6 @@ const Vault: React.FC = () => {
             onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
           >
-            <DragOverlay>
-              {activeId && sortedFolders.find(f => f.id === activeId) ? (
-                <div className="opacity-90 transform scale-105 transition-transform">
-                  <Button variant="vault-primary" className="flex-col h-auto p-3 min-w-[80px] shadow-vault-hover">
-                    <Folder className="w-6 h-6 mb-1" />
-                    <span className="text-xs truncate max-w-full">
-                      {sortedFolders.find(f => f.id === activeId)?.name}
-                    </span>
-                  </Button>
-                </div>
-              ) : null}
-            </DragOverlay>
             <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1 scrollbar-thin">
               <Button
                 variant={selectedFolder === null ? "vault-primary" : "vault"}
@@ -557,6 +545,19 @@ const Vault: React.FC = () => {
                 <span className="text-xs">New</span>
               </Button>
             </div>
+            
+            <DragOverlay>
+              {activeId && sortedFolders.find(f => f.id === activeId) ? (
+                <div className="opacity-90 transform scale-105 transition-transform">
+                  <Button variant="vault-primary" className="flex-col h-auto p-3 min-w-[80px] shadow-vault-hover rotate-3">
+                    <Folder className="w-6 h-6 mb-1" />
+                    <span className="text-xs truncate max-w-full">
+                      {sortedFolders.find(f => f.id === activeId)?.name}
+                    </span>
+                  </Button>
+                </div>
+              ) : null}
+            </DragOverlay>
           </DndContext>
         </div>
 
