@@ -291,13 +291,11 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
     disabled: false,
   });
 
-  // Real-time flowing animation - instant movement with smooth scaling
+  // Simplified real-time style with no animation delays
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition: isDragging ? 'none' : 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+    transition: 'none', // No transition for immediate positioning
     zIndex: isDragging ? 1000 : 1,
-    scale: isDragging ? '1.05' : '1',
-    opacity: isDragging ? '0.8' : '1',
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -348,7 +346,7 @@ const Vault: React.FC = () => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 1, // Immediate responsiveness for real-time movement
+        distance: 3, // Reduced distance for better responsiveness
       },
     }),
     useSensor(KeyboardSensor, {
@@ -642,38 +640,20 @@ const Vault: React.FC = () => {
                 items={sortedFolders.map(f => f.id)}
                 strategy={horizontalListSortingStrategy}
               >
-                <div className="flex gap-2 transition-all duration-150 ease-out">
-                  {sortedFolders.map((folder, index) => {
-                    const isDraggedOver = activeId && activeId !== folder.id;
-                    const shouldShift = isDraggedOver && overId === folder.id;
-                    
-                    return (
-                      <div
-                        key={folder.id}
-                        className={`transition-all duration-150 ease-out ${
-                          shouldShift ? 'transform translate-x-4' : ''
-                        } ${activeId === folder.id ? 'z-50' : ''}`}
-                        style={{
-                          transform: activeId && activeId !== folder.id && overId === folder.id 
-                            ? 'translateX(8px)' 
-                            : 'translateX(0px)',
-                        }}
-                      >
-                        <SortableFolder
-                          folder={folder}
-                          isSelected={selectedFolder === folder.id}
-                          entryCount={getFolderEntryCount(folder.id)}
-                          onClick={() => setSelectedFolder(
-                            selectedFolder === folder.id ? null : folder.id
-                          )}
-                          onEdit={(folder) => setFolderMenuOpen(folder.id)}
-                          onDelete={handleDeleteFolder}
-                          isOver={overId === `folder-drop-${folder.id}`}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
+                {sortedFolders.map((folder) => (
+                  <SortableFolder
+                    key={folder.id}
+                    folder={folder}
+                    isSelected={selectedFolder === folder.id}
+                    entryCount={getFolderEntryCount(folder.id)}
+                    onClick={() => setSelectedFolder(
+                      selectedFolder === folder.id ? null : folder.id
+                    )}
+                     onEdit={(folder) => setFolderMenuOpen(folder.id)}
+                     onDelete={handleDeleteFolder}
+                    isOver={overId === `folder-drop-${folder.id}`}
+                  />
+                ))}
               </SortableContext>
 
               <Button
