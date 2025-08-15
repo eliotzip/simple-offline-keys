@@ -256,7 +256,7 @@ const Login: React.FC = () => {
                 <>
                   <div className="relative">
                     <Input
-                      type="text"
+                      type="password"
                       placeholder="Enter PIN"
                       value={pin}
                       onChange={(e) => handlePinInput(e.target.value)}
@@ -267,27 +267,29 @@ const Login: React.FC = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 'C', 0, '←'].map((key) => (
-                      <Button
-                        key={key}
-                        type="button"
-                        variant="vault"
-                        className="aspect-square font-mono text-lg h-12 w-12"
-                        disabled={isLoading}
-                        onClick={() => {
-                          if (key === 'C') {
-                            setPin('');
-                          } else if (key === '←') {
-                            setPin(pin.slice(0, -1));
-                          } else if (typeof key === 'number' && pin.length < 8) {
-                            setPin(pin + key.toString());
-                          }
-                        }}
-                      >
-                        {key === '←' ? '⌫' : key}
-                      </Button>
-                    ))}
+                  <div className="flex justify-center">
+                    <div className="grid grid-cols-3 gap-3 w-fit">
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 'C', 0, '←'].map((key) => (
+                        <Button
+                          key={key}
+                          type="button"
+                          variant="vault"
+                          className="aspect-square font-mono text-lg h-12 w-12"
+                          disabled={isLoading}
+                          onClick={() => {
+                            if (key === 'C') {
+                              setPin('');
+                            } else if (key === '←') {
+                              setPin(pin.slice(0, -1));
+                            } else if (typeof key === 'number' && pin.length < 8) {
+                              setPin(pin + key.toString());
+                            }
+                          }}
+                        >
+                          {key === '←' ? '⌫' : key}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </>
               ) : (
@@ -324,18 +326,18 @@ const Login: React.FC = () => {
                   <p className="font-medium">Requirements:</p>
                   <div className="space-y-1">
                     {authType === 'pin' ? (
-                      <div className={`flex items-center gap-2 ${pin.length >= 4 ? 'text-vault-success' : 'text-muted-foreground'}`}>
-                        <div className={`w-2 h-2 rounded-full ${pin.length >= 4 ? 'bg-vault-success' : 'bg-muted-foreground'}`} />
+                      <div className={`flex items-center gap-2 ${pin.length >= 4 ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        <div className={`w-2 h-2 rounded-full ${pin.length >= 4 ? 'bg-foreground' : 'bg-muted-foreground'}`} />
                         At least 4 digits
                       </div>
                     ) : (
                       <>
-                        <div className={`flex items-center gap-2 ${password.length >= 6 ? 'text-vault-success' : 'text-muted-foreground'}`}>
-                          <div className={`w-2 h-2 rounded-full ${password.length >= 6 ? 'bg-vault-success' : 'bg-muted-foreground'}`} />
+                        <div className={`flex items-center gap-2 ${password.length >= 6 ? 'text-foreground' : 'text-muted-foreground'}`}>
+                          <div className={`w-2 h-2 rounded-full ${password.length >= 6 ? 'bg-foreground' : 'bg-muted-foreground'}`} />
                           At least 6 characters
                         </div>
-                        <div className={`flex items-center gap-2 ${/[a-zA-Z]/.test(password) ? 'text-vault-success' : 'text-muted-foreground'}`}>
-                          <div className={`w-2 h-2 rounded-full ${/[a-zA-Z]/.test(password) ? 'bg-vault-success' : 'bg-muted-foreground'}`} />
+                        <div className={`flex items-center gap-2 ${/[a-zA-Z]/.test(password) ? 'text-foreground' : 'text-muted-foreground'}`}>
+                          <div className={`w-2 h-2 rounded-full ${/[a-zA-Z]/.test(password) ? 'bg-foreground' : 'bg-muted-foreground'}`} />
                           Contains letters
                         </div>
                       </>
