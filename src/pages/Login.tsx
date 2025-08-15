@@ -273,7 +273,7 @@ const Login: React.FC = () => {
                       placeholder="Enter PIN"
                       value={pin}
                       onChange={(e) => handlePinInput(e.target.value)}
-                      className="text-center text-lg font-mono tracking-wider bg-input border-vault-outline focus:border-vault-outline-active"
+                      className="text-center text-lg font-mono tracking-wider bg-input border-vault-outline focus:ring-1 focus:ring-white focus:border-vault-outline"
                       autoFocus
                       disabled={isLoading}
                       maxLength={8}
@@ -313,7 +313,7 @@ const Login: React.FC = () => {
                     placeholder="Enter password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pr-10 bg-input border-vault-outline focus:border-vault-outline-active"
+                    className="pr-10 bg-input border-vault-outline focus:ring-1 focus:ring-white focus:border-vault-outline"
                     autoFocus
                     disabled={isLoading}
                   />
@@ -346,7 +346,7 @@ const Login: React.FC = () => {
                     ) : (
                       <div className={`flex items-center gap-2 ${password.length >= 6 ? 'text-foreground' : 'text-muted-foreground'}`}>
                         <div className={`w-2 h-2 rounded-full ${password.length >= 6 ? 'bg-foreground' : 'bg-muted-foreground'}`} />
-                        At least 6 characters only
+                        At least 6 characters
                       </div>
                     )}
                   </div>

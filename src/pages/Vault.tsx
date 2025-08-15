@@ -18,7 +18,8 @@ import {
   User,
   Eye,
   EyeOff,
-  Shield
+  Shield,
+  MoreVertical
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -177,6 +178,13 @@ interface SortableFolderProps {
   onDelete: (id: string) => void;
 }
 
+interface FolderMenuProps {
+  folder: VaultFolder;
+  onRename: (folder: VaultFolder) => void;
+  onDelete: (id: string) => void;
+  onClose: () => void;
+}
+
 interface FolderDropZoneProps {
   folder: VaultFolder;
   isSelected: boolean;
@@ -186,6 +194,38 @@ interface FolderDropZoneProps {
   onDelete: (id: string) => void;
   isOver: boolean;
 }
+
+const FolderMenu: React.FC<FolderMenuProps> = ({ folder, onRename, onDelete, onClose }) => {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+      <div className="bg-background border border-foreground/20 rounded-lg p-6 w-72 max-w-[90vw]" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-lg font-semibold mb-4 text-center">{folder.name}</h3>
+        <div className="space-y-3">
+          <Button
+            variant="outline"
+            className="w-full border-foreground/20 text-foreground hover:bg-foreground hover:text-background"
+            onClick={() => {
+              onRename(folder);
+              onClose();
+            }}
+          >
+            Rename Folder
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full border-foreground/20 text-foreground hover:bg-foreground hover:text-background"
+            onClick={() => {
+              onDelete(folder.id);
+              onClose();
+            }}
+          >
+            Delete Folder
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const FolderDropZone: React.FC<FolderDropZoneProps> = ({
   folder,
@@ -216,13 +256,13 @@ const FolderDropZone: React.FC<FolderDropZoneProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-5 w-5 text-destructive"
+            className="h-5 w-5 text-muted-foreground hover:text-foreground"
             onClick={(e) => {
               e.stopPropagation();
-              onDelete(folder.id);
+              onEdit(folder);
             }}
           >
-            <Trash2 className="w-3 h-3" />
+            <MoreVertical className="w-3 h-3" />
           </Button>
         </div>
       </Button>
@@ -283,7 +323,7 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
 };
 
 const Vault: React.FC = () => {
-  const { data, lock, deleteEntry, reorderEntries, reorderFolders, createFolder, deleteFolder, moveEntryToFolder } = useVault();
+  const { data, lock, deleteEntry, reorderEntries, reorderFolders, createFolder, deleteFolder, moveEntryToFolder, updateFolder } = useVault();
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -298,6 +338,10 @@ const Vault: React.FC = () => {
   const [folderToDelete, setFolderToDelete] = useState<string | null>(null);
   const [createFolderDialogOpen, setCreateFolderDialogOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
+  const [folderMenuOpen, setFolderMenuOpen] = useState<string | null>(null);
+  const [renameFolderDialogOpen, setRenameFolderDialogOpen] = useState(false);
+  const [folderToRename, setFolderToRename] = useState<VaultFolder | null>(null);
+  const [renameFolderName, setRenameFolderName] = useState('');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -411,6 +455,44 @@ const Vault: React.FC = () => {
   const handleDeleteFolder = (id: string) => {
     setFolderToDelete(id);
     setDeleteDialogOpen(true);
+  };
+
+  const handleRenameFolder = (folder: VaultFolder) => {
+    setFolderToRename(folder);
+    setRenameFolderName(folder.name);
+    setRenameFolderDialogOpen(true);
+  };
+
+  const handleConfirmRenameFolder = async () => {
+    if (folderToRename && renameFolderName?.trim()) {
+      // Check for duplicate names (excluding current folder)
+      const trimmedName = renameFolderName.trim();
+      const existingFolder = data?.folders.find(f => 
+        f.id !== folderToRename.id && f.name.toLowerCase() === trimmedName.toLowerCase()
+      );
+      
+      if (existingFolder) {
+        toast({
+          title: "Duplicate Name",
+          description: "A folder with this name already exists. Please choose a different name.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const success = await updateFolder(folderToRename.id, trimmedName);
+      toast({
+        title: success ? "Folder Renamed" : "Error",
+        description: success ? "Folder renamed successfully" : "Failed to rename folder",
+        variant: success ? "default" : "destructive",
+      });
+      
+      if (success) {
+        setRenameFolderDialogOpen(false);
+        setFolderToRename(null);
+        setRenameFolderName('');
+      }
+    }
   };
 
   const handleConfirmDeleteFolder = async () => {
@@ -567,8 +649,8 @@ const Vault: React.FC = () => {
                     onClick={() => setSelectedFolder(
                       selectedFolder === folder.id ? null : folder.id
                     )}
-                    onEdit={() => {}}
-                    onDelete={handleDeleteFolder}
+                     onEdit={(folder) => setFolderMenuOpen(folder.id)}
+                     onDelete={handleDeleteFolder}
                     isOver={overId === `folder-drop-${folder.id}`}
                   />
                 ))}
@@ -742,6 +824,58 @@ const Vault: React.FC = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Rename Folder Dialog */}
+        <Dialog open={renameFolderDialogOpen} onOpenChange={setRenameFolderDialogOpen}>
+          <DialogContent className="sm:max-w-md bg-background border border-border">
+            <DialogHeader>
+              <DialogTitle className="text-foreground">Rename Folder</DialogTitle>
+              <DialogDescription className="text-muted-foreground">
+                Enter a new name for the folder.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <Input
+                placeholder="Folder name"
+                value={renameFolderName}
+                onChange={(e) => setRenameFolderName(e.target.value)}
+                className="bg-background border-border text-foreground"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleConfirmRenameFolder();
+                  }
+                }}
+                autoFocus
+              />
+            </div>
+            <DialogFooter className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setRenameFolderDialogOpen(false)}
+                className="bg-background border-border text-foreground hover:bg-muted"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleConfirmRenameFolder}
+                disabled={!renameFolderName.trim()}
+                className="bg-foreground text-background hover:bg-foreground/90"
+              >
+                Rename
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Folder Menu Popup */}
+        {folderMenuOpen && (
+          <FolderMenu
+            folder={data.folders.find(f => f.id === folderMenuOpen)!}
+            onRename={handleRenameFolder}
+            onDelete={handleDeleteFolder}
+            onClose={() => setFolderMenuOpen(null)}
+          />
+        )}
       </div>
     </div>
   );
