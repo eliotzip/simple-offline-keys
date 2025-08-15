@@ -695,7 +695,7 @@ const Vault: React.FC = () => {
           onDragEnd={handleDragEnd}
         >
           {/* Folders */}
-          <div className="mb-6 vault-slide-up">
+          <div className="mb-6 vault-slide-up" style={{ marginTop: '1px' }}>
             <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1 scrollbar-thin">
               <Button
                 variant={selectedFolder === null ? "vault-primary" : "vault"}
