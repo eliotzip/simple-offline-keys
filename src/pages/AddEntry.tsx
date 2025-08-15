@@ -207,18 +207,7 @@ const AddEntry: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={generatePassword}
-                    className="text-xs"
-                  >
-                    Generate
-                  </Button>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -226,21 +215,34 @@ const AddEntry: React.FC = () => {
                     placeholder="Enter password"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="pr-10 bg-input border-vault-outline focus:border-vault-outline-active"
+                    className="pr-20 bg-input border-vault-outline focus:border-vault-outline-active"
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </Button>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={generatePassword}
+                      title="Generate password"
+                    >
+                      <Key className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setShowPassword(!showPassword)}
+                      title={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <Eye className="w-4 h-4" />
+                      ) : (
+                        <EyeOff className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </div>
 
@@ -312,19 +314,19 @@ const AddEntry: React.FC = () => {
 
         {/* Warning Dialog */}
         {showWarning && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-sm border-vault-warning shadow-vault-hover">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-vault-warning">
-                  <AlertTriangle className="w-5 h-5" />
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 vault-fade-in">
+            <Card className="w-full max-w-sm border-vault-outline shadow-vault-hover vault-scale-in bg-background">
+              <CardHeader className="text-center">
+                <CardTitle className="flex items-center justify-center gap-2">
+                  <AlertTriangle className="w-6 h-6" />
                   No Password
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="text-sm text-muted-foreground mb-6 text-center">
                   You're about to save an entry without a password. This is not recommended for security.
                 </p>
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <Button
                     variant="vault"
                     size="sm"
@@ -334,13 +336,17 @@ const AddEntry: React.FC = () => {
                     Go Back
                   </Button>
                   <Button
-                    variant="vault-danger"
+                    variant="vault-primary"
                     size="sm"
-                    className="flex-1"
+                    className="flex-1 bg-destructive hover:bg-destructive/90 border-destructive"
                     onClick={handleSaveWithoutPassword}
                     disabled={isLoading}
                   >
-                    Save Anyway
+                    {isLoading ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
+                    ) : (
+                      'Save Anyway'
+                    )}
                   </Button>
                 </div>
               </CardContent>

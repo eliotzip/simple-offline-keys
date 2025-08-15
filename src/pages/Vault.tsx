@@ -30,6 +30,8 @@ import {
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
+  DragOverEvent,
+  useDroppable,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -166,34 +168,36 @@ interface SortableFolderProps {
   onDelete: (id: string) => void;
 }
 
-const SortableFolder: React.FC<SortableFolderProps> = ({
+interface FolderDropZoneProps {
+  folder: VaultFolder;
+  isSelected: boolean;
+  entryCount: number;
+  onClick: () => void;
+  onEdit: (folder: VaultFolder) => void;
+  onDelete: (id: string) => void;
+  isOver: boolean;
+}
+
+const FolderDropZone: React.FC<FolderDropZoneProps> = ({
   folder,
   isSelected,
   entryCount,
   onClick,
   onEdit,
   onDelete,
+  isOver,
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: folder.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
+  const { setNodeRef } = useDroppable({
+    id: `folder-drop-${folder.id}`,
+  });
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef}>
       <Button
         variant={isSelected ? "vault-primary" : "vault"}
-        className="flex-col h-auto p-3 min-w-[80px] group relative"
+        className={`flex-col h-auto p-3 min-w-[80px] group relative transition-vault-smooth ${
+          isOver ? 'ring-2 ring-vault-outline-active scale-105' : ''
+        }`}
         onClick={onClick}
       >
         <Folder className="w-6 h-6 mb-1" />
@@ -220,8 +224,47 @@ const SortableFolder: React.FC<SortableFolderProps> = ({
   );
 };
 
+const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
+  folder,
+  isSelected,
+  entryCount,
+  onClick,
+  onEdit,
+  onDelete,
+  isOver,
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: folder.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <FolderDropZone
+        folder={folder}
+        isSelected={isSelected}
+        entryCount={entryCount}
+        onClick={onClick}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        isOver={isOver}
+      />
+    </div>
+  );
+};
+
 const Vault: React.FC = () => {
-  const { data, lock, deleteEntry, reorderEntries, reorderFolders, createFolder, deleteFolder } = useVault();
+  const { data, lock, deleteEntry, reorderEntries, reorderFolders, createFolder, deleteFolder, moveEntryToFolder } = useVault();
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -229,6 +272,7 @@ const Vault: React.FC = () => {
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(new Set());
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -332,11 +376,33 @@ const Vault: React.FC = () => {
     setActiveId(event.active.id as string);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragOver = (event: DragOverEvent) => {
+    setOverId(event.over?.id as string || null);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
+    setOverId(null);
 
     if (!over || active.id === over.id) return;
+
+    // Handle entry being dropped into a folder
+    if (typeof over.id === 'string' && over.id.startsWith('folder-drop-')) {
+      const folderId = over.id.replace('folder-drop-', '');
+      const entryId = active.id as string;
+      
+      if (filteredEntries.find(e => e.id === entryId)) {
+        const success = await moveEntryToFolder(entryId, folderId);
+        if (success) {
+          toast({
+            title: "Entry Moved",
+            description: "Entry has been moved to the folder",
+          });
+        }
+        return;
+      }
+    }
 
     // Handle folder reordering
     if (sortedFolders.find(f => f.id === active.id)) {
@@ -403,12 +469,13 @@ const Vault: React.FC = () => {
 
         {/* Folders */}
         <div className="mb-6 vault-slide-up">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          >
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDragEnd={handleDragEnd}
+            >
             <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2">
               <Button
                 variant={selectedFolder === null ? "vault-primary" : "vault"}
@@ -437,6 +504,7 @@ const Vault: React.FC = () => {
                     )}
                     onEdit={() => {}}
                     onDelete={handleDeleteFolder}
+                    isOver={overId === `folder-drop-${folder.id}`}
                   />
                 ))}
               </SortableContext>
@@ -495,6 +563,7 @@ const Vault: React.FC = () => {
               sensors={sensors}
               collisionDetection={closestCenter}
               onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
               onDragEnd={handleDragEnd}
             >
               <SortableContext
