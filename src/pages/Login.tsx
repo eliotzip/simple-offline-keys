@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useVault } from '@/contexts/VaultContext';
 import { VaultCrypto } from '@/lib/crypto';
 import { useToast } from '@/hooks/use-toast';
-import { Lock, Shield, Eye, EyeOff, ArrowRight, KeySquare, Type } from 'lucide-react';
+import { Lock, Shield, Eye, EyeOff, ArrowRight, KeySquare, Type, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 type LoginStep = 'welcome' | 'choose-auth' | 'pin' | 'password' | 'existing';
@@ -238,6 +238,19 @@ const Login: React.FC = () => {
 
         <Card className="border-vault-outline shadow-vault">
           <CardHeader className="text-center">
+            <div className="flex items-center justify-between mb-2">
+              {isNewVault && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setCurrentStep('choose-auth')}
+                  className="h-8 w-8"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </Button>
+              )}
+              <div className="flex-1" />
+            </div>
             <CardTitle className="flex items-center justify-center gap-2">
               <Lock className="w-5 h-5" />
               {isNewVault ? pageTitle : existingTitle}
@@ -369,8 +382,9 @@ const Login: React.FC = () => {
 
             {isNewVault && (
               <div className="mt-6 p-4 rounded-lg border border-foreground/20 bg-background">
-                <p className="text-sm font-medium">
-                  ⚠️ Important: Remember your {authType}. There is no recovery option for offline vaults.
+                <p className="text-sm font-medium flex items-center gap-2">
+                  <span className="text-foreground">⚠️</span>
+                  Important: Remember your {authType}. There is no recovery option for offline vaults.
                 </p>
               </div>
             )}
