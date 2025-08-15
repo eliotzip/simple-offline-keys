@@ -243,9 +243,9 @@ const FolderDropZone: React.FC<FolderDropZoneProps> = ({
   return (
     <div ref={setNodeRef} className="relative w-full h-full">
       <Button
-        variant={isSelected ? "vault" : "vault"}
+        variant="vault"
         className={`w-full h-full flex-col p-3 min-w-[80px] group relative transition-vault-smooth ${
-          isSelected ? 'ring-2 ring-white/50 border-white/30' : ''
+          isSelected ? 'border-white text-white' : 'hover:border-white hover:text-white'
         } ${
           isOver ? 'ring-2 ring-vault-outline-active scale-105 bg-vault-hover border-vault-outline-active' : ''
         }`}
