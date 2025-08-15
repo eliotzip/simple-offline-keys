@@ -252,10 +252,9 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition: isDragging ? 'none' : transition, // Disable transition while dragging for real-time movement
-    opacity: isDragging ? 0.7 : 1,
+    transition: 'none', // Always disable transition for real-time movement
+    opacity: 1, // Keep fully opaque
     zIndex: isDragging ? 50 : 1,
-    scale: isDragging ? '1.05' : '1',
   };
 
   const handleClick = (e: React.MouseEvent) => {
