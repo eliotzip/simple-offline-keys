@@ -281,13 +281,13 @@ const Login: React.FC = () => {
                   </div>
 
                   <div className="flex justify-center">
-                    <div className="grid grid-cols-3 gap-3 w-fit">
+                    <div className="grid grid-cols-3 gap-4 w-fit">
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 'C', 0, '←'].map((key) => (
                         <Button
                           key={key}
                           type="button"
                           variant="vault"
-                          className="aspect-square font-mono text-lg h-12 w-12"
+                          className="aspect-square font-mono text-xl h-16 w-16"
                           disabled={isLoading}
                           onClick={() => {
                             if (key === 'C') {
