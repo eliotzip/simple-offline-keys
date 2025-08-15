@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useVault } from '@/contexts/VaultContext';
 import { useToast } from '@/hooks/use-toast';
 import { copyToClipboard, VaultEntry, VaultFolder } from '@/lib/crypto';
@@ -291,6 +292,12 @@ const Vault: React.FC = () => {
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(new Set());
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
+  
+  // Dialog states
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [folderToDelete, setFolderToDelete] = useState<string | null>(null);
+  const [createFolderDialogOpen, setCreateFolderDialogOpen] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -367,11 +374,15 @@ const Vault: React.FC = () => {
     setVisiblePasswords(newVisible);
   };
 
-  const handleCreateFolder = async () => {
-    const name = prompt('Enter folder name:');
-    if (name?.trim()) {
+  const handleCreateFolder = () => {
+    setNewFolderName('');
+    setCreateFolderDialogOpen(true);
+  };
+
+  const handleConfirmCreateFolder = async () => {
+    if (newFolderName?.trim()) {
       // Check for duplicate names
-      const trimmedName = name.trim();
+      const trimmedName = newFolderName.trim();
       const existingFolder = data?.folders.find(f => f.name.toLowerCase() === trimmedName.toLowerCase());
       
       if (existingFolder) {
@@ -389,13 +400,23 @@ const Vault: React.FC = () => {
         description: success ? "New folder created" : "Failed to create folder",
         variant: success ? "default" : "destructive",
       });
+      
+      if (success) {
+        setCreateFolderDialogOpen(false);
+        setNewFolderName('');
+      }
     }
   };
 
-  const handleDeleteFolder = async (id: string) => {
-    if (confirm('Delete this folder? Entries will be moved to the main vault.')) {
-      const success = await deleteFolder(id);
-      if (selectedFolder === id) {
+  const handleDeleteFolder = (id: string) => {
+    setFolderToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDeleteFolder = async () => {
+    if (folderToDelete) {
+      const success = await deleteFolder(folderToDelete);
+      if (selectedFolder === folderToDelete) {
         setSelectedFolder(null);
       }
       toast({
@@ -403,6 +424,9 @@ const Vault: React.FC = () => {
         description: success ? "Folder deleted successfully" : "Failed to delete folder",
         variant: success ? "default" : "destructive",
       });
+      
+      setDeleteDialogOpen(false);
+      setFolderToDelete(null);
     }
   };
 
@@ -648,6 +672,76 @@ const Vault: React.FC = () => {
             ) : null}
           </DragOverlay>
         </DndContext>
+
+        {/* Delete Folder Dialog */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent className="sm:max-w-md bg-background border border-border">
+            <DialogHeader>
+              <DialogTitle className="text-foreground">Delete Folder</DialogTitle>
+              <DialogDescription className="text-muted-foreground">
+                Are you sure you want to delete this folder? All entries will be moved to the main vault.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setDeleteDialogOpen(false)}
+                className="bg-background border-border text-foreground hover:bg-muted"
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={handleConfirmDeleteFolder}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Create Folder Dialog */}
+        <Dialog open={createFolderDialogOpen} onOpenChange={setCreateFolderDialogOpen}>
+          <DialogContent className="sm:max-w-md bg-background border border-border">
+            <DialogHeader>
+              <DialogTitle className="text-foreground">Create New Folder</DialogTitle>
+              <DialogDescription className="text-muted-foreground">
+                Enter a name for your new folder.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <Input
+                placeholder="Folder name"
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+                className="bg-background border-border text-foreground"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleConfirmCreateFolder();
+                  }
+                }}
+                autoFocus
+              />
+            </div>
+            <DialogFooter className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setCreateFolderDialogOpen(false)}
+                className="bg-background border-border text-foreground hover:bg-muted"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleConfirmCreateFolder}
+                disabled={!newFolderName.trim()}
+                className="bg-foreground text-background hover:bg-foreground/90"
+              >
+                Create
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
