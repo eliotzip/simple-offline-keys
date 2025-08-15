@@ -101,18 +101,15 @@ const SortableEntry: React.FC<SortableEntryProps> = ({
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                {/* Mobile drag handle */}
                 {isMobile && (
                   <div 
-                    className="cursor-grab active:cursor-grabbing p-2 -ml-2 -my-1 rounded-md hover:bg-muted/50 transition-colors"
+                    className="cursor-grab active:cursor-grabbing p-1 -ml-1"
                     {...attributes} 
                     {...listeners}
                   >
                     <GripVertical className="w-4 h-4 text-muted-foreground" />
                   </div>
                 )}
-                
-                {/* Entry content */}
                 <div 
                   className={`flex-1 min-w-0 ${!isMobile ? 'cursor-grab active:cursor-grabbing' : ''}`}
                   {...(!isMobile ? attributes : {})} 
@@ -135,7 +132,6 @@ const SortableEntry: React.FC<SortableEntryProps> = ({
                 </div>
               </div>
               
-              {/* Action buttons */}
               <div className={`flex items-center gap-1 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
                 <Button
                   variant="ghost"
@@ -302,64 +298,30 @@ const FolderDropZone: React.FC<FolderDropZoneProps> = ({
 
   return (
     <div ref={setNodeRef} className="relative w-full h-full">
-      <div
-        className={`relative w-full h-16 rounded-xl transition-all duration-300 ease-in-out cursor-pointer group ${
-          isSelected 
-            ? 'bg-gradient-to-r from-vault-primary to-vault-primary/80 text-vault-primary-foreground shadow-lg border-2 border-vault-outline-active' 
-            : 'bg-gradient-to-r from-vault-surface to-vault-surface/80 border border-vault-outline hover:border-vault-outline-hover hover:shadow-md'
-        } ${
-          isOver ? 'ring-2 ring-vault-outline-active scale-105 bg-gradient-to-r from-vault-hover to-vault-hover/80 shadow-xl' : ''
-        }`}
+      <Button
+        variant={isSelected ? "vault-primary" : "vault"}
+        className={`w-full h-full flex-col p-3 min-w-[80px] group relative transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg ${
+          isOver ? 'ring-2 ring-vault-outline-active scale-110 bg-vault-hover border-vault-outline-active shadow-xl' : ''
+        } ${isSelected ? 'shadow-lg border-2 border-vault-outline-active' : 'border-vault-outline hover:border-vault-outline-hover'}`}
         onClick={onClick}
       >
-        {/* Background pattern */}
-        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-transparent via-white/5 to-transparent pointer-events-none" />
-        
-        {/* Main content */}
-        <div className="flex items-center justify-center h-full px-4 relative">
-          {/* Folder icon */}
-          <div className="flex-shrink-0 mr-3">
-            <div className={`p-2 rounded-lg transition-all duration-300 ${
-              isSelected 
-                ? 'bg-white/20' 
-                : 'bg-vault-outline/10 group-hover:bg-vault-outline/20'
-            } ${isOver ? 'animate-pulse bg-vault-outline-active/30' : ''}`}>
-              <Folder className={`w-5 h-5 transition-all duration-300 ${
-                isOver ? 'animate-bounce' : ''
-              } ${isSelected ? 'text-vault-primary-foreground' : 'text-vault-outline group-hover:text-vault-outline-hover'}`} />
-            </div>
-          </div>
-          
-          {/* Folder name and entry count */}
-          <div className="flex-1 min-w-0 text-center">
-            <div className={`font-medium text-sm truncate ${
-              isSelected ? 'text-vault-primary-foreground' : 'text-foreground'
-            }`}>
-              {folder.name}
-            </div>
-            {entryCount > 0 && (
-              <div className={`text-xs mt-0.5 ${
-                isSelected ? 'text-vault-primary-foreground/80' : 'text-muted-foreground'
-              }`}>
-                {entryCount} {entryCount === 1 ? 'entry' : 'entries'}
-              </div>
-            )}
-          </div>
-          
-          {/* Entry count badge */}
+        <div className="relative">
+          <Folder className={`w-8 h-8 mb-2 transition-all duration-300 ${
+            isOver ? 'animate-bounce' : ''
+          } ${isSelected ? 'text-vault-primary-foreground' : 'text-vault-outline group-hover:text-vault-outline-hover'}`} />
           {entryCount > 0 && (
-            <div className="absolute -top-2 -right-2 bg-vault-primary text-vault-primary-foreground text-xs rounded-full w-6 h-6 flex items-center justify-center font-medium shadow-lg">
+            <div className="absolute -top-1 -right-1 bg-vault-primary text-vault-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {entryCount}
             </div>
           )}
         </div>
+        <span className="text-xs truncate max-w-full font-medium">{folder.name}</span>
         
-        {/* Mobile/Desktop actions */}
-        <div className={`absolute top-2 right-2 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
+        <div className={`absolute top-1 right-1 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6 text-muted-foreground hover:text-foreground bg-background/80 hover:bg-background rounded-full shadow-sm"
+            className="h-6 w-6 text-muted-foreground hover:text-foreground bg-background/80 hover:bg-background rounded-full"
             onClick={(e) => {
               e.stopPropagation();
               onEdit(folder);
@@ -368,7 +330,7 @@ const FolderDropZone: React.FC<FolderDropZoneProps> = ({
             <MoreVertical className="w-3 h-3" />
           </Button>
         </div>
-      </div>
+      </Button>
     </div>
   );
 };
@@ -410,20 +372,17 @@ const SortableFolder: React.FC<SortableFolderProps & { isOver: boolean }> = ({
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="min-w-[200px] w-full max-w-xs">
+    <div ref={setNodeRef} style={style} className="min-w-[80px]">
       <div className="relative w-full h-full">
-        {/* Mobile drag handle */}
         {isMobile && (
           <div 
-            className="absolute top-2 left-2 z-20 cursor-grab active:cursor-grabbing p-1 bg-background/90 rounded-md shadow-sm border border-vault-outline/20"
+            className="absolute top-1 left-1 z-10 cursor-grab active:cursor-grabbing p-1"
             {...attributes} 
             {...listeners}
           >
-            <GripVertical className="w-4 h-4 text-muted-foreground" />
+            <GripVertical className="w-3 h-3 text-muted-foreground bg-background/80 rounded" />
           </div>
         )}
-        
-        {/* Desktop drag area */}
         <div 
           {...(!isMobile ? attributes : {})} 
           {...(!isMobile ? listeners : {})} 
@@ -749,54 +708,44 @@ const Vault: React.FC = () => {
         >
           {/* Folders */}
           <div className="mb-6 vault-slide-up">
-            <div className="flex items-center gap-4 mb-4 overflow-x-auto pb-2 scrollbar-thin">
-              {/* All folder button - keeping original design */}
-              <div className="flex-shrink-0">
-                <Button
-                  variant={selectedFolder === null ? "vault-primary" : "vault"}
-                  className="flex-col h-auto p-3 min-w-[80px] rounded-lg"
-                  onClick={() => setSelectedFolder(null)}
-                >
-                  <Folder className="w-6 h-6 mb-1" />
-                  <span className="text-xs">All</span>
-                </Button>
-              </div>
+            <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1 scrollbar-thin">
+              <Button
+                variant={selectedFolder === null ? "vault-primary" : "vault"}
+                className="flex-col h-auto p-3 min-w-[80px] flex-shrink-0"
+                onClick={() => setSelectedFolder(null)}
+              >
+                <Folder className="w-6 h-6 mb-1" />
+                <span className="text-xs">All</span>
+              </Button>
 
               <SortableContext
                 items={sortedFolders.map(f => f.id)}
                 strategy={horizontalListSortingStrategy}
               >
-                <div className="flex gap-4 items-center">
-                  {sortedFolders.map((folder) => (
-                    <SortableFolder
-                      key={folder.id}
-                      folder={folder}
-                      isSelected={selectedFolder === folder.id}
-                      entryCount={getFolderEntryCount(folder.id)}
-                      onClick={() => setSelectedFolder(
-                        selectedFolder === folder.id ? null : folder.id
-                      )}
-                      onEdit={(folder) => setFolderMenuOpen(folder.id)}
-                      onDelete={handleDeleteFolder}
-                      isOver={overId === `folder-drop-${folder.id}`}
-                    />
-                  ))}
-                </div>
+                {sortedFolders.map((folder) => (
+                  <SortableFolder
+                    key={folder.id}
+                    folder={folder}
+                    isSelected={selectedFolder === folder.id}
+                    entryCount={getFolderEntryCount(folder.id)}
+                    onClick={() => setSelectedFolder(
+                      selectedFolder === folder.id ? null : folder.id
+                    )}
+                     onEdit={(folder) => setFolderMenuOpen(folder.id)}
+                     onDelete={handleDeleteFolder}
+                    isOver={overId === `folder-drop-${folder.id}`}
+                  />
+                ))}
               </SortableContext>
 
-              {/* New folder button */}
-              <div className="flex-shrink-0">
-                <Button
-                  variant="vault"
-                  className="flex-col h-16 p-3 min-w-[200px] rounded-xl border-2 border-dashed border-vault-outline hover:border-vault-outline-hover transition-all duration-300"
-                  onClick={handleCreateFolder}
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <FolderPlus className="w-5 h-5" />
-                    <span className="text-sm font-medium">New Folder</span>
-                  </div>
-                </Button>
-              </div>
+              <Button
+                variant="vault"
+                className="flex-col h-auto p-3 min-w-[80px] flex-shrink-0"
+                onClick={handleCreateFolder}
+              >
+                <FolderPlus className="w-6 h-6 mb-1" />
+                <span className="text-xs">New</span>
+              </Button>
             </div>
           </div>
 
